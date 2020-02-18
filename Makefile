@@ -1,0 +1,3 @@
+lint:
+	black .
+	isort **/*.py
