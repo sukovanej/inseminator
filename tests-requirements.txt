@@ -2,6 +2,7 @@ appdirs==1.4.3            # via black, virtualenv
 attrs==19.3.0             # via black, pytest
 black==19.10b0
 click==7.0                # via black
+coverage==5.0.3           # via pytest-cov
 distlib==0.3.0            # via virtualenv
 entrypoints==0.3          # via flake8
 filelock==3.0.12          # via tox, virtualenv
@@ -18,6 +19,7 @@ py==1.8.1                 # via pytest, tox
 pycodestyle==2.5.0        # via flake8
 pyflakes==2.1.1           # via flake8
 pyparsing==2.4.6          # via packaging
+pytest-cov==2.8.1
 pytest==5.3.5
 regex==2020.1.8           # via black
 six==1.14.0               # via packaging, tox, virtualenv
