@@ -1,4 +1,4 @@
-from typing import Any, Generic, TypeVar, Protocol
+from typing import Any, Generic, Protocol, TypeVar
 
 T = TypeVar("T", covariant=True)
 

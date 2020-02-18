@@ -23,3 +23,7 @@ jobs:
     - name: Test with tox
       run: |
         python -m tox
+    - name: Static analysis
+      run: |
+        black --check .
+        isort --check **/*.py
