@@ -1,0 +1,5 @@
+celery[redis]
+sqlalchemy
+psycopg2
+alembic
+requests
