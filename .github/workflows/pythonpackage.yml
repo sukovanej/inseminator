@@ -22,4 +22,4 @@ jobs:
         pip install -r tests-requirements.txt
     - name: Test with tox
       run: |
-        tox
+        python -m tox
