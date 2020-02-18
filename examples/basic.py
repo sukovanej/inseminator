@@ -1,11 +1,13 @@
 from container import Container
 
+
 class DomainModel:
     def __init__(self):
         self.__logic_constant = 1
 
     def domain_logic(self, input_value: int) -> int:
         return input_value + self.__logic_constant
+
 
 class Controller:
     def __init__(self, domain_model: DomainModel):
