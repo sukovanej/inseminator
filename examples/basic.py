@@ -1,21 +1,3 @@
-# Container
-
-[![codecov](https://codecov.io/gh/sukovanej/container/branch/master/graph/badge.svg)](https://codecov.io/gh/sukovanej/container)
-
-Python library for type-based dependency injection
-
-*Under development*
-
-## Installation
-
-*Not published yet, you can build yourself at the moment*
-
-## Usage
-
-You start by defining *container* of your dependencies. Whenever you want the container to resolve a dependency 
-it uses the container to search for existing objects and a resolver automatically creates desired dependencies.
-
-```Python
 from container import Container
 
 class DomainModel:
@@ -42,4 +24,3 @@ container = Container()
 controller = container.resolve(Controller)
 result = controller.handler(1)
 print(result)
-```
