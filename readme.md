@@ -63,7 +63,7 @@ a well cohesive and minimally coupled code. If you are new to designing an appli
 by thinking about code coupling and cohesion I strongly recommend reading great
 books from **R. C. Martin** (aka Uncle Bob) or **Martin Fowler**. 
 
-I bet mos developers are aware of the famous *Clean Code* and *Clean Architecture* books. 
+I bet most developers are aware of the famous *Clean Code* and *Clean Architecture* books. 
 While I don't want to be pedantic about all the details in these books I also hate the
 state of mind like 
 
@@ -79,7 +79,7 @@ language for very fast prototyping. The problem is that when you start the busin
 from the very beginning you are not forced to think about the design of the application and
 the main driver is very fast implementation and delivering to a customer. That is totally rasonable.
 
-But sometimes you might feel like adding new features and introducing new coleges to the codebase
+But sometimes you might feel like adding new features and introducing new colleages to the codebase
 is very hard (as a consequence - expensive). When searching for a single thing in the code
 you find yourself being in a package containing database queries and json output construction
 for the API at the same time. Moreover the session object for a database is somehow magically
@@ -134,13 +134,13 @@ def endpoint_handler(body_input):
 The code above is a simple API with an abillity to talk to database, save application
 metrics, output logs and talk to another services (use your imagination). Actually it
 doesn't look so bad and if I was writing a simple 100-line application with similar 
-abbilities such a design would be sufficient and if it turned out we need to extend it
+abbilities such a design would be sufficient and if it turned out we need to extend it,
 it is not a big deal to rewrite 100-line Python application within a more robust design
 decisions.
 
 Now, let's imagine this piece of code is part of 10k-line long Python application. 
 
-  - **ability to test** - somewhere from *zero* to *what the heck is automatic testing?*. 
+  - **ability to test** - somewhere from *zero* to *what the heck is automatic testing?*.
     Since everything is happening in the import-time you can use monkeypatching and hope
     the code will never change, that makes sense in the beginning but than you decide to
     change a single component of your system and you find out you have to delete all the
@@ -149,11 +149,11 @@ Now, let's imagine this piece of code is part of 10k-line long Python applicatio
     broken and you will be repairing them all the time?
 
   - **ability to maintain** - you will spend half of your day searching when and where did
-    the session object get configured and while is the connection pool limit set to 5 instead 
+    the session object get configured and why is the connection pool limit set to 5 instead
     of 10. Bus factor seems to be around 0.
 
   - **ability to extend** - if you are okay with copy / paste and you are good in testing
-    in production then probably no problem.
+    in a production then probably no problem.
 
 
 Let's see something similar.
@@ -216,14 +216,14 @@ summarize cons if this approach.
     same code for more types of application - usually API (flask) and async queueu (celery), we are
     forced to prepare all the dependencies for both of them.
 
-  - obviously in the production it does the same thing like the previous implementation but 
+  - obviously in the production it does the same thing like the previous implementation but
     using a slightly complicated code and more lines of it.
 
-  - when dealing with the code we not only have to thing about the code behaviour but also its
+  - when dealing with the code we not only have to think about the code behaviour but also its
     dependencies because it is explicitly asking us to provide them through class constructors
     which is super annoying!
 
-The good news is a lot of annoying problems mentioned above is solved by using factories or
+The good news is a lot of annoying problems mentioned above are solved by using factories or
 injectors. Also it seems like these disadvantages rather disappear in a shine of the benefits.
 
   - The first awesome thing is we are doing absolutely nothing in the import time. The only
@@ -234,7 +234,7 @@ injectors. Also it seems like these disadvantages rather disappear in a shine of
 
   - If we have tests it should be easier to maintain the application, also now the Domain class
     has a clear signature thus it is obvious what are the dependencies. Moreover, setup of some
-    critical components like loggin and database now probably happens in a single place - in the
+    critical components like logging and database now probably happens in a single place - in the
     entrypoint or handler functions, it doesn't matter the key point is we have complete control
     over our code execution.
 
