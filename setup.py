@@ -9,6 +9,6 @@ setup(
     author="Milan Suk",
     author_email="Milansuk@email.com",
     url="https://www.github.com/sukovanej/container/",
-    package_dir={"inseminator": "src"},
-    packages=["inseminator"],
+    package_dir={"inseminator": "src", "inseminator.integrations": "src/integrations"},
+    packages=["inseminator", "inseminator.integrations"],
 )

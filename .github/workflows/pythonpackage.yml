@@ -25,7 +25,7 @@ jobs:
         python -m tox
     - name: Static analysis
       run: |
-        black --check .
+        black --check --line-length 120 .
         isort --check **/*.py
     - name: Generate coverage report
       run: |
