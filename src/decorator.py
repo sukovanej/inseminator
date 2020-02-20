@@ -1,7 +1,7 @@
 from functools import wraps
 from typing import Any, Callable, Dict, Type, TypeVar, cast, get_type_hints
 
-from .injector import DependencyResolver
+from .resolver import DependencyResolver
 
 
 class DecoratorResolver:
