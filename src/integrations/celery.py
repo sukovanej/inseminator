@@ -1,8 +1,6 @@
-from typing import TypeVar, Protocol, Callable
-
+from typing import Callable, Protocol, TypeVar
 
 from ..container import Container
-
 
 T = TypeVar("T")
 

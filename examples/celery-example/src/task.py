@@ -4,7 +4,6 @@ from inseminator.integrations import celery_task
 from .celery_factory import celery_factory
 from .domain import DomainLogic
 
-
 container = Container()
 celery = container.resolve(celery_factory)
 

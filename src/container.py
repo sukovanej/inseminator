@@ -1,20 +1,23 @@
+from __future__ import annotations
+
 from typing import Any, Callable, Dict, Type, TypeVar, Union
 
 from .decorator import DecoratorResolver
 from .dependency import Dependency, StaticDependency
 from .exceptions import ContainerRegisterError
-from .injector import DependencyResolver
+from .resolver import DependencyResolver
+from .scoped_dict import ScopedDict
 
 T = TypeVar("T")
 Dependable = Union[Callable[..., T], Type[T]]
 
 
 class Container:
-    def __init__(self) -> None:
-        self._container: Dict[Dependable, Dependency] = {}
+    def __init__(self, parent_scoped_dict: ScopedDict[Dependable, Dependency] = None) -> None:
+        self._container: ScopedDict[Dependable, Dependency] = ScopedDict(parent_scoped_dict)
         self._resolver = DependencyResolver(self._container)
 
-    def register(self, dependency: Type[T], value: T = None, factory: Callable[..., T] = None) -> None:
+    def register(self, dependency: Type[T], *, value: T = None, factory: Callable[..., T] = None) -> None:
         resolved_dependency: Dependency[T]
 
         if value is not None and factory is not None:
@@ -34,6 +37,9 @@ class Container:
             self.register(dependency)
 
         return self._container[dependency].get_instance()
+
+    def sub_container(self) -> Container:
+        return Container(parent_scoped_dict=self._container)
 
     def inject(self, fn: Callable[..., T]) -> Callable[..., T]:
         decorator_resolver = DecoratorResolver(resolver=self._resolver)

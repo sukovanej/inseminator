@@ -4,7 +4,6 @@ import pytest
 
 from src.container import Container
 from src.exceptions import ContainerRegisterError
-from src.injector import DependencyResolver
 
 
 def test_basic_register_resolve():
