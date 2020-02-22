@@ -5,7 +5,7 @@ from inseminator import Container
 
 class DomainModel(Protocol):
     def domain_logic(self, input_value: int) -> int:
-        ...
+        raise NotImplementedError
 
 
 class Controller:
