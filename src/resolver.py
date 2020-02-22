@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Callable, Dict, Protocol, Type, TypeVar, Union, cast, get_type_hints
+from typing import Any, Callable, Dict, Optional, Protocol, Type, TypeVar, Union, cast, get_type_hints
 
 from .dependency import Dependency, StaticDependency
 from .exceptions import ResolverError
@@ -14,7 +14,7 @@ class DependencyResolver:
     def __init__(self, container: ScopedDict[Dependable, Dependency]) -> None:
         self._container = container
 
-    def resolve(self, dependency: Dependable) -> Dependency[T]:
+    def resolve(self, dependency: Dependable, parameters: Optional[Dict[str, Dependable]] = None) -> Dependency[T]:
         if dependency in self._container:
             return self._container[dependency]
 
@@ -28,8 +28,17 @@ class DependencyResolver:
 
         args: Dict[str, Any] = {}
 
+        if parameters:
+            parameter_names = type_hints.keys()
+
+            for parameter_name, parameter_dependency in parameters.items():
+                if parameter_name not in parameter_names:
+                    raise ResolverError(f"Parameter {parameter_name} it not part of {dependency.__name__}'s signature.")
+
+                args[parameter_name] = self.resolve(parameter_dependency).get_instance()
+
         for parameter_name, parameter_dependency in type_hints.items():
-            if parameter_name == "return":
+            if parameter_name == "return" or parameter_name in args:
                 continue
 
             args[parameter_name] = self.resolve(parameter_dependency).get_instance()
