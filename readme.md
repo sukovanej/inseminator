@@ -15,7 +15,13 @@ and noisy boilerplate. Inseminator is meant to be used in an entry-point layer o
 application and the only thing it requires is properly type-hinted classes 
 dependencies.
 
-*(Under development)*
+## Installation
+
+Install using the pip tool.
+
+```
+pip install inseminator
+```
 
 ## Usage
 
