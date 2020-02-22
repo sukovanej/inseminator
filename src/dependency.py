@@ -5,7 +5,7 @@ T = TypeVar("T", covariant=True)
 
 class Dependency(Protocol, Generic[T]):
     def get_instance(self) -> T:
-        ...
+        raise NotImplementedError
 
 
 class StaticDependency(Generic[T]):

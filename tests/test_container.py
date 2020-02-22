@@ -56,3 +56,41 @@ def test_sub_container_2():
     client = sub_container.resolve(Client)
 
     assert client.x == 1
+
+
+def test_resolving_with_parameters():
+    class FirstDependency:
+        x = 1
+
+    class Dependency(Protocol):
+        y: int
+
+    class ConcreteDependency:
+        y = 2
+
+    class Client:
+        def __init__(self, first_dependency: FirstDependency, second_dependency: Dependency) -> None:
+            self.x = first_dependency.x
+            self.y = second_dependency.y
+
+        def add(self) -> int:
+            return self.x + self.y
+
+    container = Container()
+    client = container.resolve(Client, second_dependency=ConcreteDependency)
+
+    assert client.add() == 3
+
+
+def test_resolving_with_wrong_parameters():
+    class Dependency:
+        x = 1
+
+    class Client:
+        def __init__(self, dependency: Dependency) -> None:
+            self._dependency = dependency
+
+    container = Container()
+
+    with pytest.raises(ResolverError):
+        client = container.resolve(Client, non_existing_parameter=Dependency())

@@ -7,7 +7,7 @@ T = TypeVar("T")
 
 class Celery(Protocol):
     def task(self, fn: Callable[..., T]) -> T:
-        ...
+        raise NotImplementedError
 
 
 def celery_task(celery: Celery, container: Container) -> Callable:
