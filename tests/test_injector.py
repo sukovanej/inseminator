@@ -153,3 +153,33 @@ def test_value_and_factory_register_exception():
 
     with pytest.raises(ContainerRegisterError):
         container.register(Dependency, factory=dependency_factory, value=Dependency(2))
+
+
+def test_resolve_with_default_values():
+    class Dependency:
+        def __init__(self, x: int = 1):
+            self.x = x
+
+    class Service:
+        def __init__(self, dependency: Dependency, value: int = 1):
+            self.x = dependency.x + value
+
+    container = Container()
+    service = container.resolve(Service)
+
+    assert service.x == 2
+
+
+def test_resolve_with_default_values_override_with_parameters():
+    class Dependency:
+        def __init__(self, x: int = 1):
+            self.x = x
+
+    class Service:
+        def __init__(self, dependency: Dependency, value: int = 1):
+            self.x = dependency.x + value
+
+    container = Container()
+    service = container.resolve(Service, value=2)
+
+    assert service.x == 3
