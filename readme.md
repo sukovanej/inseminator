@@ -131,7 +131,7 @@ also with keywords and tell the resolve how it should resolve some particular pa
 
 ```Python
 container = Container()
-controller = container.resolve(Controller, domain_model=ConcreteDomainModel)
+controller = container.resolve(Controller, domain_model=ConcreteDomainModel())
 ```
 
 Moreover, using this approach `ConcreteDomainModel` is not evaluated and saved in the container but
