@@ -18,14 +18,16 @@ class DependencyResolver:
         if dependency in self._container:
             return self._container[dependency]
 
+        callable_dependency: Callable
         if inspect.isclass(dependency):
             if issubclass(cast(type, dependency), cast(type, Protocol)):
                 raise ResolverError(f"Implementation for {dependency.__name__} protocol is not defined.")
 
-            type_hints = get_type_hints(dependency.__init__)  # type: ignore
+            callable_dependency = dependency.__init__  # type: ignore
         elif inspect.isfunction(dependency):
-            type_hints = get_type_hints(dependency)
+            callable_dependency = dependency
 
+        type_hints = get_type_hints(callable_dependency)
         args: Dict[str, Any] = {}
 
         if parameters:
@@ -37,10 +39,14 @@ class DependencyResolver:
 
                 args[parameter_name] = parameter_value
 
+        signature_parameters = inspect.signature(dependency).parameters
         for parameter_name, parameter_dependency in type_hints.items():
             if parameter_name == "return" or parameter_name in args:
                 continue
 
-            args[parameter_name] = self.resolve(parameter_dependency).get_instance()
+            if (default_value := signature_parameters[parameter_name].default) != inspect.Signature.empty:
+                args[parameter_name] = default_value
+            else:
+                args[parameter_name] = self.resolve(parameter_dependency).get_instance()
 
         return StaticDependency(instance=dependency(**args))
