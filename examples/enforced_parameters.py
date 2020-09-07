@@ -33,6 +33,6 @@ container = Container()
 
 # view layer handling
 
-controller = container.resolve(Controller, domain_model=ConcreteDomainModel)
+controller = container.resolve(Controller, domain_model=ConcreteDomainModel())
 result = controller.handler(1)
 print(result)
