@@ -39,7 +39,7 @@ class DependencyResolver:
 
                 args[parameter_name] = parameter_value
 
-        signature_parameters = inspect.signature(dependency).parameters
+        signature_parameters = inspect.signature(callable_dependency).parameters
         for parameter_name, parameter_dependency in type_hints.items():
             if parameter_name == "return" or parameter_name in args:
                 continue
