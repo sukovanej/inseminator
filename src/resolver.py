@@ -1,6 +1,8 @@
 import inspect
 from typing import Any, Callable, Dict, Optional, Protocol, Type, TypeVar, Union, cast, get_type_hints
 
+from pydantic import BaseSettings
+
 from .dependency import Dependency, StaticDependency
 from .exceptions import ResolverError
 from .scoped_dict import ScopedDict
@@ -20,6 +22,9 @@ class DependencyResolver:
 
         callable_dependency: Callable
         if inspect.isclass(dependency):
+            if issubclass(cast(type, dependency), BaseSettings):
+                return StaticDependency(cast(T, dependency()))
+
             if issubclass(cast(type, dependency), cast(type, Protocol)):
                 raise ResolverError(f"Implementation for {dependency.__name__} protocol is not defined.")
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union
 
 from .decorator import DecoratorResolver
 from .dependency import Dependency, StaticDependency
@@ -13,7 +13,7 @@ Dependable = Union[Callable[..., T], Type[T]]
 
 
 class Container:
-    def __init__(self, parent_scoped_dict: ScopedDict[Dependable, Dependency] = None) -> None:
+    def __init__(self, parent_scoped_dict: Optional[ScopedDict[Dependable, Dependency]] = None) -> None:
         self._container: ScopedDict[Dependable, Dependency] = ScopedDict(parent_scoped_dict)
         self._resolver = DependencyResolver(self._container)
 
@@ -21,9 +21,9 @@ class Container:
         self,
         dependency: Type[T],
         *,
-        value: T = None,
-        factory: Callable[..., T] = None,
-        parameters: Dict[str, Dependable] = None,
+        value: Optional[T] = None,
+        factory: Optional[Callable[..., T]] = None,
+        parameters: Optional[Dict[str, Dependable]] = None,
     ) -> None:
         resolved_dependency: Dependency[T]
 
