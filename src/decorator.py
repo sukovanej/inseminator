@@ -9,20 +9,30 @@ class DecoratorResolver:
         self.__resolver = resolver
 
     def inject_function(self, fn: Callable) -> Callable:
-        type_hints = get_type_hints(fn)
-        injected_args: Dict[str, Any] = {}
-
-        for parameter_name, parameter_dependency in type_hints.items():
-            if parameter_name == "return" or not isinstance(parameter_dependency, ParameterDependence):
-                continue
-
-            injected_args[parameter_name] = self.__resolver.resolve(
-                parameter_dependency.parameter_dependency
-            ).get_instance()
-
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            return fn(*args, **{**injected_args, **kwargs})
+            args = list(args).copy()
+            type_hints = get_type_hints(fn)
+
+            positional_arguments = []
+            kw_arguments = {}
+
+            for parameter_name, parameter_dependency in type_hints.items():
+                if parameter_name == "return" or not isinstance(parameter_dependency, ParameterDependence):
+                    if args:
+                        positional_arguments.append(args.pop(0))
+                    continue
+
+                dependency = self.__resolver.resolve(parameter_dependency.parameter_dependency)
+
+                if args:
+                    positional_arguments.append(dependency.get_instance())
+                else:
+                    kw_arguments[parameter_name] = dependency.get_instance()
+
+            kw_arguments.update(kwargs)
+
+            return fn(*positional_arguments, **kw_arguments)
 
         return wrapper
 
