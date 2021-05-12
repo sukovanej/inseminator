@@ -51,3 +51,6 @@ class Container:
     def inject(self, fn: Callable[..., T]) -> Callable[..., T]:
         decorator_resolver = DecoratorResolver(resolver=self._resolver)
         return decorator_resolver.inject_function(fn)
+
+    def clear(self) -> None:
+        self._container.clear()

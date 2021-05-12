@@ -31,6 +31,8 @@ class DependencyResolver:
             callable_dependency = dependency.__init__  # type: ignore
         elif inspect.isfunction(dependency):
             callable_dependency = dependency
+        else:
+            raise ResolverError(f"Dependency must be a function or a class, {dependency} found.")
 
         type_hints = get_type_hints(callable_dependency)
         args: Dict[str, Any] = {}

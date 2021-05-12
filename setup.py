@@ -9,7 +9,7 @@ with open("readme.md", "r") as fh:
 
 setup(
     name="inseminator",
-    version="0.4.0",
+    version="0.4.1",
     description="Python dependency injection library based on type hints",
     author="Milan Suk",
     author_email="Milansuk@email.com",
