@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import NewType, Protocol
 
 import pytest
 
@@ -94,3 +94,27 @@ def test_resolving_with_wrong_parameters():
 
     with pytest.raises(ResolverError):
         client = container.resolve(Client, non_existing_parameter=Dependency())
+
+
+def test_more_complex_example():
+    class Dependency:
+        x = 1
+
+    def factory():
+        return 1
+
+    Dep = NewType("Dep", int)
+
+    class Client:
+        def __init__(self, dep1: Dependency, dep2: Dep) -> None:
+            self.dep1 = dep1
+            self.dep2 = dep2
+
+    container = Container()
+    container.register(Dep, factory=factory)
+    container.register(Dependency, value=Dependency())
+
+    client = container.resolve(Client)
+
+    assert client.dep1.x == 1
+    assert client.dep2 == 1
