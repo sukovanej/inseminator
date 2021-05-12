@@ -9,11 +9,12 @@ with open("readme.md", "r") as fh:
 
 setup(
     name="inseminator",
-    version="0.3.0",
+    version="0.3.1",
     description="Python dependency injection library based on type hints",
     author="Milan Suk",
     author_email="Milansuk@email.com",
     url="https://www.github.com/sukovanej/inseminator/",
+    package_data={"inseminator": ["py.typed"]},
     package_dir={"inseminator": "src", "inseminator.integrations": "src/integrations"},
     packages=["inseminator", "inseminator.integrations"],
     long_description=long_description,
