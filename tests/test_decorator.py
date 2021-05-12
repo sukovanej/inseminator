@@ -10,7 +10,7 @@ def test_decorator_dependency():
     container = Container()
 
     @container.inject
-    def my_function(dependency: Depends(Dependency), value: int) -> int:
+    def my_function(value: int, dependency: Dependency = Depends(Dependency)) -> int:
         return value + dependency.x
 
     assert my_function(value=1) == 2
@@ -24,7 +24,7 @@ def test_decorator_dependency_with_positional_arguments():
     container = Container()
 
     @container.inject
-    def my_function(dependency: Depends(Dependency), value: int) -> int:
+    def my_function(value: int, dependency: Dependency = Depends(Dependency)) -> int:
         return value + dependency.x
 
     assert my_function(1) == 2
@@ -38,7 +38,7 @@ def test_decorator_dependency_with_mixed_arguments():
     container = Container()
 
     @container.inject
-    def my_function(p1: int, p2: int, dep: Depends(Dependency), p3: int, p4: int) -> int:
+    def my_function(p1: int, p2: int, p3: int, p4: int, dep: Dependency = Depends(Dependency)) -> int:
         return p1 + p2 + dep.x + p3 + p4
 
     assert my_function(1, 2, 3, p4=4) == 11

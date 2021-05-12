@@ -163,7 +163,7 @@ container = Container()
 
 
 @container.inject
-def my_handler(input_value: int, dependency: Depends(Dependency)):
+def my_handler(input_value: int, dependency: Dependency = Depends(Dependency)):
     return input_value + dependency.x
 ```
 

@@ -1,4 +1,5 @@
 from typing import NewType, Protocol
+from unittest.mock import MagicMock, call
 
 import pytest
 
@@ -118,3 +119,30 @@ def test_more_complex_example():
 
     assert client.dep1.x == 1
     assert client.dep2 == 1
+
+
+def test_container_clear() -> None:
+    test_callable = MagicMock()
+
+    class Dependency:
+        def __init__(self):
+            test_callable()
+
+    class Client:
+        def __init__(self, dep: Dependency):
+            ...
+
+    container = Container()
+
+    container.resolve(Dependency)
+    test_callable.assert_called_once()
+
+    container.resolve(Dependency)
+    test_callable.assert_called_once()
+
+    container.clear()
+    container.resolve(Dependency)
+    test_callable.assert_has_calls([call(), call()])
+
+    container.resolve(Dependency)
+    test_callable.assert_has_calls([call(), call()])

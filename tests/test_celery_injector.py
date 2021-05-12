@@ -19,7 +19,7 @@ def test_dummy_celery_injector():
     celery = Celery()
 
     @celery_task(celery, container)
-    def my_function(dependency: Depends(Dependency)):
+    def my_function(dependency: Dependency = Depends(Dependency)):
         return dependency.x
 
     assert my_function() == 1

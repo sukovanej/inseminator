@@ -1,3 +1,4 @@
+import inspect
 from functools import wraps
 from typing import Any, Callable, Dict, Type, TypeVar, cast, get_type_hints
 
@@ -11,28 +12,24 @@ class DecoratorResolver:
     def inject_function(self, fn: Callable) -> Callable:
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            args = list(args).copy()
             type_hints = get_type_hints(fn)
+            injected_args: Dict[str, Any] = {}
 
-            positional_arguments = []
-            kw_arguments = {}
+            signature_parameters = inspect.signature(fn).parameters
+            for parameter_name, parameter in signature_parameters.items():
+                default = parameter.default
 
-            for parameter_name, parameter_dependency in type_hints.items():
-                if parameter_name == "return" or not isinstance(parameter_dependency, ParameterDependence):
-                    if args:
-                        positional_arguments.append(args.pop(0))
+                if (
+                    parameter_name == "return"
+                    or default == inspect.Signature.empty
+                    or not isinstance(default, ParameterDependence)
+                ):
                     continue
 
-                dependency = self.__resolver.resolve(parameter_dependency.parameter_dependency)
+                dependency = self.__resolver.resolve(default.parameter_dependency)
+                injected_args[parameter_name] = dependency.get_instance()
 
-                if args:
-                    positional_arguments.append(dependency.get_instance())
-                else:
-                    kw_arguments[parameter_name] = dependency.get_instance()
-
-            kw_arguments.update(kwargs)
-
-            return fn(*positional_arguments, **kw_arguments)
+            return fn(*args, **{**injected_args, **kwargs})
 
         return wrapper
 
