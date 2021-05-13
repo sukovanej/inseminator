@@ -146,3 +146,23 @@ def test_container_clear() -> None:
 
     container.resolve(Dependency)
     test_callable.assert_has_calls([call(), call()])
+
+
+def test_missing_dependencies() -> None:
+    class Dependency:
+        ...
+
+    class Client:
+        def __init__(self, dep: Dependency, unknown_dep):
+            ...
+
+    def function(dep: Client, unknown_param):
+        ...
+
+    container = Container()
+
+    with pytest.raises(ResolverError, match="Can resolve dependencies for"):
+        container.resolve(Client)
+
+    with pytest.raises(ResolverError, match="Can resolve dependencies for"):
+        container.resolve(function)
