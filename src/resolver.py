@@ -21,6 +21,7 @@ class DependencyResolver:
             return self._container[dependency]
 
         callable_dependency: Callable
+        is_class = False
         if inspect.isclass(dependency):
             if issubclass(cast(type, dependency), BaseSettings):
                 return StaticDependency(cast(T, dependency()))
@@ -29,6 +30,7 @@ class DependencyResolver:
                 raise ResolverError(f"Implementation for {dependency.__name__} protocol is not defined.")
 
             callable_dependency = dependency.__init__  # type: ignore
+            is_class = True
         elif inspect.isfunction(dependency):
             callable_dependency = dependency
         else:
@@ -54,6 +56,22 @@ class DependencyResolver:
             if (default_value := signature_parameters[parameter_name].default) != inspect.Signature.empty:
                 args[parameter_name] = default_value
             else:
-                args[parameter_name] = self.resolve(parameter_dependency).get_instance()
+                try:
+                    args[parameter_name] = self.resolve(parameter_dependency).get_instance()
+                except ResolverError as e:
+                    raise ResolverError(f"{dependency} -> " + str(e))
+
+        skippable_params = (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+        injectable_arguments = [p for n, p in signature_parameters.items() if p.kind not in skippable_params]
+        number_of_parameters = len(injectable_arguments)
+
+        if is_class:
+            # because the callable is init and the self must be skipped
+            number_of_parameters -= 1
+
+        if (missing := number_of_parameters - len(args)) > 0:
+            raise ResolverError(
+                f"Can resolve dependencies for {dependency}. All type annotations must be specified, {missing} missing."
+            )
 
         return StaticDependency(instance=dependency(**args))
