@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union
 from .decorator import DecoratorResolver
 from .dependency import Dependency, StaticDependency
 from .exceptions import ContainerRegisterError
+from .metrics import Metrics
 from .resolver import DependencyResolver
 from .scoped_dict import ScopedDict
 
@@ -13,9 +14,15 @@ Dependable = Union[Callable[..., T], Type[T]]
 
 
 class Container:
-    def __init__(self, parent_scoped_dict: Optional[ScopedDict[Dependable, Dependency]] = None) -> None:
+    def __init__(
+        self, parent_scoped_dict: Optional[ScopedDict[Dependable, Dependency]] = None, metrics: Optional[Metrics] = None
+    ) -> None:
         self._container: ScopedDict[Dependable, Dependency] = ScopedDict(parent_scoped_dict)
         self._resolver = DependencyResolver(self._container)
+        self._metrics = metrics
+
+    def set_metrics(self, metrics: Metrics) -> None:
+        self._metrics = metrics
 
     def register(
         self,
@@ -49,7 +56,7 @@ class Container:
         return Container(parent_scoped_dict=self._container)
 
     def inject(self, fn: Callable[..., T]) -> Callable[..., T]:
-        decorator_resolver = DecoratorResolver(resolver=self._resolver)
+        decorator_resolver = DecoratorResolver(resolver=self._resolver, metrics=self._metrics)
         return decorator_resolver.inject_function(fn)
 
     def clear(self) -> None:

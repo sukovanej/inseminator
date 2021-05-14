@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, call
 
 import pytest
 
+from src import Depends
 from src.container import Container
 from src.exceptions import ResolverError
 
@@ -166,3 +167,27 @@ def test_missing_dependencies() -> None:
 
     with pytest.raises(ResolverError, match="Can resolve dependencies for"):
         container.resolve(function)
+
+
+def test_metrics():
+    metrics = MagicMock()
+    container = Container(metrics=metrics)
+
+    class B:
+        ...
+
+    class C:
+        ...
+
+    class A:
+        def __init__(self, b: B, c: C) -> None:
+            ...
+
+    @container.inject
+    def my_function(dependency=Depends(A)) -> None:
+        ...
+
+    for _ in range(100):
+        my_function()
+
+    assert metrics.save_metric.mock_calls

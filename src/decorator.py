@@ -1,21 +1,24 @@
 import inspect
+import time
 from functools import wraps
-from typing import Any, Callable, Dict, Type, TypeVar, cast, get_type_hints
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast, get_type_hints
 
+from .metrics import Metrics
 from .resolver import DependencyResolver
 
 
 class DecoratorResolver:
-    def __init__(self, resolver: DependencyResolver) -> None:
+    def __init__(self, resolver: DependencyResolver, metrics: Optional[Metrics] = None) -> None:
         self.__resolver = resolver
+        self.__metrics = metrics
 
     def inject_function(self, fn: Callable) -> Callable:
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            type_hints = get_type_hints(fn)
+            signature_parameters = inspect.signature(fn).parameters
+            t1 = time.perf_counter()
             injected_args: Dict[str, Any] = {}
 
-            signature_parameters = inspect.signature(fn).parameters
             for parameter_name, parameter in signature_parameters.items():
                 default = parameter.default
 
@@ -28,6 +31,11 @@ class DecoratorResolver:
 
                 dependency = self.__resolver.resolve(default.parameter_dependency)
                 injected_args[parameter_name] = dependency.get_instance()
+
+            dt = time.perf_counter() - t1
+
+            if self.__metrics is not None:
+                self.__metrics.save_metric(fn.__name__, dt)
 
             return fn(*args, **{**injected_args, **kwargs})
 
