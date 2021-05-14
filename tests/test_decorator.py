@@ -1,3 +1,5 @@
+from threading import Thread
+from time import sleep
 from unittest.mock import MagicMock, call
 
 from src.container import Container
@@ -61,10 +63,16 @@ def test_inject_cache():
         ...
 
     test_fn.assert_not_called()
+
     function()
     test_fn.assert_called_once()
     function()
     test_fn.assert_called_once()
+
+    container.clear()
+
+    function()
+    test_fn.assert_has_calls([call(), call()])
 
 
 def test_inject_scoped():
@@ -77,7 +85,7 @@ def test_inject_scoped():
     container = Container()
 
     @container.inject_scoped
-    def function(d=Depends(Dependency)):
+    def function(d: Dependency = Depends(Dependency)):
         ...
 
     test_fn.assert_not_called()
@@ -85,3 +93,30 @@ def test_inject_scoped():
     test_fn.assert_called_once()
     function()
     test_fn.assert_has_calls([call(), call()])
+
+
+def test_cache_thread_safety():
+    test_fn = MagicMock()
+
+    class Dependency:
+        def __init__(self):
+            sleep(0.1)
+            test_fn()
+
+    container = Container()
+
+    @container.inject
+    def function(d: Dependency = Depends(Dependency)):
+        ...
+
+    threads = []
+
+    for _ in range(10):
+        thread = Thread(target=function)
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    test_fn.assert_called_once()

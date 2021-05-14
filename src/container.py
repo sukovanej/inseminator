@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union
 
 from .decorator import DecoratorResolver
 from .dependency import Dependency, StaticDependency
@@ -20,6 +20,7 @@ class Container:
         self._container: ScopedDict[Dependable, Dependency] = ScopedDict(parent_scoped_dict)
         self._resolver = DependencyResolver(self._container)
         self._metrics = metrics
+        self._decorator_resolvers: List[DecoratorResolver] = []
 
     def set_metrics(self, metrics: Metrics) -> None:
         self._metrics = metrics
@@ -57,11 +58,16 @@ class Container:
 
     def inject(self, fn: Callable[..., T]) -> Callable[..., T]:
         decorator_resolver = DecoratorResolver(resolver=self._resolver, metrics=self._metrics)
+        self._decorator_resolvers.append(decorator_resolver)
         return decorator_resolver.inject_function(fn)
 
     def inject_scoped(self, fn: Callable[..., T]) -> Callable[..., T]:
         decorator_resolver = DecoratorResolver(resolver=self._resolver, metrics=self._metrics, cache_enabled=False)
+        self._decorator_resolvers.append(decorator_resolver)
         return decorator_resolver.inject_function(fn)
 
     def clear(self) -> None:
         self._container.clear()
+
+        for decorator_resolve in self._decorator_resolvers:
+            decorator_resolve.clear_cache()

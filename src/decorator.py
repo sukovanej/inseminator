@@ -1,7 +1,8 @@
 import inspect
 import time
 from functools import wraps
-from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast, get_type_hints
+from threading import Lock
+from typing import Any, Callable, Dict, Mapping, Optional, Type, TypeVar, cast, get_type_hints
 
 from .metrics import Metrics
 from .resolver import DependencyResolver
@@ -14,40 +15,52 @@ class DecoratorResolver:
         self.__resolver = resolver
         self.__metrics = metrics
         self.__cache_enabled = cache_enabled
+        self.__cache: Dict[str, Any] = {}
+        self.__lock = Lock()
+
+    def clear_cache(self):
+        self.__cache.clear()
+
+    def construct_dependencies(self, parameters: Mapping[str, inspect.Parameter]) -> Dict[str, Any]:
+        injected_args: Dict[str, Any] = {}
+
+        for parameter_name, parameter in parameters.items():
+            default = parameter.default
+
+            if (
+                parameter_name == "return"
+                or default == inspect.Signature.empty
+                or not isinstance(default, ParameterDependence)
+            ):
+                continue
+
+            dependency: Any = self.__resolver.resolve(default.parameter_dependency).get_instance()
+            injected_args[parameter_name] = dependency
+
+        return injected_args
 
     def inject_function(self, fn: Callable) -> Callable:
         signature_parameters = inspect.signature(fn).parameters
-        cache = {}
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
             t1 = time.perf_counter()
             injected_args: Dict[str, Any] = {}
 
-            for parameter_name, parameter in signature_parameters.items():
-                default = parameter.default
+            if self.__cache_enabled:
+                self.__lock.acquire()
 
-                if (
-                    parameter_name == "return"
-                    or default == inspect.Signature.empty
-                    or not isinstance(default, ParameterDependence)
-                ):
-                    continue
+                if not self.__cache:
+                    self.__cache = self.construct_dependencies(signature_parameters)
 
-                if self.__cache_enabled:
-                    if default.parameter_dependency not in cache:
-                        dependency = self.__resolver.resolve(default.parameter_dependency).get_instance()
-                        cache[default.parameter_dependency] = dependency
-                    else:
-                        dependency = cache[default.parameter_dependency]
-                else:
-                    dependency = self.__resolver.resolve(default.parameter_dependency).get_instance()
+                self.__lock.release()
 
-                injected_args[parameter_name] = dependency
-
-            dt = time.perf_counter() - t1
+                injected_args = self.__cache
+            else:
+                injected_args = self.construct_dependencies(signature_parameters)
 
             if self.__metrics is not None:
+                dt = time.perf_counter() - t1
                 self.__metrics.save_metric(fn.__name__, dt)
 
             return fn(*args, **{**injected_args, **kwargs})
