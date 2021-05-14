@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, call
+
 from src.container import Container
 from src.decorator import Depends
 
@@ -43,3 +45,43 @@ def test_decorator_dependency_with_mixed_arguments():
 
     assert my_function(1, 2, 3, p4=4) == 11
     assert my_function(1, p3=2, p2=3, p4=4) == 11
+
+
+def test_inject_cache():
+    test_fn = MagicMock()
+
+    class Dependency:
+        def __init__(self):
+            test_fn()
+
+    container = Container()
+
+    @container.inject
+    def function(d=Depends(Dependency)):
+        ...
+
+    test_fn.assert_not_called()
+    function()
+    test_fn.assert_called_once()
+    function()
+    test_fn.assert_called_once()
+
+
+def test_inject_scoped():
+    test_fn = MagicMock()
+
+    class Dependency:
+        def __init__(self):
+            test_fn()
+
+    container = Container()
+
+    @container.inject_scoped
+    def function(d=Depends(Dependency)):
+        ...
+
+    test_fn.assert_not_called()
+    function()
+    test_fn.assert_called_once()
+    function()
+    test_fn.assert_has_calls([call(), call()])

@@ -8,12 +8,16 @@ from .resolver import DependencyResolver
 
 
 class DecoratorResolver:
-    def __init__(self, resolver: DependencyResolver, metrics: Optional[Metrics] = None) -> None:
+    def __init__(
+        self, resolver: DependencyResolver, metrics: Optional[Metrics] = None, cache_enabled: bool = True
+    ) -> None:
         self.__resolver = resolver
         self.__metrics = metrics
+        self.__cache_enabled = cache_enabled
 
     def inject_function(self, fn: Callable) -> Callable:
         signature_parameters = inspect.signature(fn).parameters
+        cache = {}
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -30,8 +34,16 @@ class DecoratorResolver:
                 ):
                     continue
 
-                dependency = self.__resolver.resolve(default.parameter_dependency)
-                injected_args[parameter_name] = dependency.get_instance()
+                if self.__cache_enabled:
+                    if default.parameter_dependency not in cache:
+                        dependency = self.__resolver.resolve(default.parameter_dependency).get_instance()
+                        cache[default.parameter_dependency] = dependency
+                    else:
+                        dependency = cache[default.parameter_dependency]
+                else:
+                    dependency = self.__resolver.resolve(default.parameter_dependency).get_instance()
+
+                injected_args[parameter_name] = dependency
 
             dt = time.perf_counter() - t1
 

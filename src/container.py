@@ -59,5 +59,9 @@ class Container:
         decorator_resolver = DecoratorResolver(resolver=self._resolver, metrics=self._metrics)
         return decorator_resolver.inject_function(fn)
 
+    def inject_scoped(self, fn: Callable[..., T]) -> Callable[..., T]:
+        decorator_resolver = DecoratorResolver(resolver=self._resolver, metrics=self._metrics, cache_enabled=False)
+        return decorator_resolver.inject_function(fn)
+
     def clear(self) -> None:
         self._container.clear()
