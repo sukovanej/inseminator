@@ -13,9 +13,10 @@ class DecoratorResolver:
         self.__metrics = metrics
 
     def inject_function(self, fn: Callable) -> Callable:
+        signature_parameters = inspect.signature(fn).parameters
+
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            signature_parameters = inspect.signature(fn).parameters
             t1 = time.perf_counter()
             injected_args: Dict[str, Any] = {}
 

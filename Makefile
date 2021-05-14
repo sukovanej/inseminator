@@ -1,3 +1,5 @@
 lint:
-	isort src/**/*.py tests/**/*.py setup.py
+	isort src/**/*.py 
+	isort tests/**/*.py 
+	isort setup.py
 	black setup.py src tests
