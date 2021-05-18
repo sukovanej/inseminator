@@ -17,14 +17,21 @@ class DecoratorResolver:
         self.__cache_enabled = cache_enabled
         self.__cache: Dict[str, Any] = {}
         self.__lock = Lock()
+        self.__parameters: Optional[Mapping[str, inspect.Parameter]] = None
+
+    def preload(self) -> None:
+        self.__cache = self.construct_dependencies()
 
     def clear_cache(self):
         self.__cache.clear()
 
-    def construct_dependencies(self, parameters: Mapping[str, inspect.Parameter]) -> Dict[str, Any]:
+    def construct_dependencies(self) -> Dict[str, Any]:
         injected_args: Dict[str, Any] = {}
 
-        for parameter_name, parameter in parameters.items():
+        if self.__parameters is None:
+            raise Exception("parameters not set")
+
+        for parameter_name, parameter in self.__parameters.items():
             default = parameter.default
 
             if (
@@ -40,7 +47,7 @@ class DecoratorResolver:
         return injected_args
 
     def inject_function(self, fn: Callable) -> Callable:
-        signature_parameters = inspect.signature(fn).parameters
+        self.__parameters = inspect.signature(fn).parameters
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -51,13 +58,13 @@ class DecoratorResolver:
                 self.__lock.acquire()
 
                 if not self.__cache:
-                    self.__cache = self.construct_dependencies(signature_parameters)
+                    self.__cache = self.construct_dependencies()
 
                 self.__lock.release()
 
                 injected_args = self.__cache
             else:
-                injected_args = self.construct_dependencies(signature_parameters)
+                injected_args = self.construct_dependencies()
 
             if self.__metrics is not None:
                 dt = time.perf_counter() - t1
