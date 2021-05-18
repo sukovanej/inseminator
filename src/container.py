@@ -71,3 +71,7 @@ class Container:
 
         for decorator_resolve in self._decorator_resolvers:
             decorator_resolve.clear_cache()
+
+    def preload_injected(self) -> None:
+        for decorator_resolve in self._decorator_resolvers:
+            decorator_resolve.preload()

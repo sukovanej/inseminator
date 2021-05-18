@@ -191,3 +191,38 @@ def test_metrics():
         my_function()
 
     assert metrics.save_metric.mock_calls
+
+
+def test_preload():
+    container = Container()
+    m1, m2, m3 = MagicMock(), MagicMock(), MagicMock()
+
+    class B:
+        def __init__(self) -> None:
+            m1()
+
+    class C:
+        def __init__(self) -> None:
+            m2()
+
+    class A:
+        def __init__(self, b: B, c: C) -> None:
+            m3()
+
+    @container.inject
+    def my_function(dependency=Depends(A)) -> None:
+        ...
+
+    @container.inject
+    def another_function(dependency=Depends(B)) -> None:
+        ...
+
+    @container.inject
+    def and_another_function(dependency=Depends(C)) -> None:
+        ...
+
+    container.preload_injected()
+
+    m1.assert_has_calls([call(), call()])
+    m2.assert_has_calls([call(), call()])
+    m3.assert_has_calls([call()])
