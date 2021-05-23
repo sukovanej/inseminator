@@ -13,6 +13,9 @@ T = TypeVar("T")
 Dependable = Union[Callable[..., T], Type[T]]
 
 
+boooooordel
+
+
 class DependencyResolver:
     def __init__(self, container: ScopedDict[Dependable, Dependency]) -> None:
         self._container = container
