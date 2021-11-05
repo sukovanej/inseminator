@@ -3,9 +3,9 @@ from unittest.mock import MagicMock, call
 
 import pytest
 
-from src import Depends
-from src.container import Container
-from src.exceptions import ResolverError
+from inseminator import Depends
+from inseminator.container import Container
+from inseminator.exceptions import ResolverError
 
 
 def test_sub_container():

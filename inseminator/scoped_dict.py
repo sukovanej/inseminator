@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import Generic, Optional, TypeVar
+from typing import Dict, Generic, Optional, TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")
 
 
-class ScopedDict(dict, Generic[K, V]):
+class ScopedDict(Generic[K, V], Dict[K, V]):
     def __init__(self, parent_dict: Optional[ScopedDict[K, V]] = None) -> None:
         self.__parent_dict = parent_dict
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union, cast
 
 from .decorator import DecoratorResolver
 from .dependency import Dependency, StaticDependency
@@ -10,7 +10,7 @@ from .resolver import DependencyResolver
 from .scoped_dict import ScopedDict
 
 T = TypeVar("T")
-Dependable = Union[Callable[..., T], Type[T]]
+Dependable = Union[Callable[..., Any], Any]
 
 
 class Container:
@@ -33,7 +33,7 @@ class Container:
         factory: Optional[Callable[..., T]] = None,
         parameters: Optional[Dict[str, Dependable]] = None,
     ) -> None:
-        resolved_dependency: Dependency[T]
+        resolved_dependency: Dependency
 
         if value is not None and factory is not None:
             raise ContainerRegisterError("Can't decide whether to use factory or value for dependency instantiation")
@@ -51,7 +51,7 @@ class Container:
         if dependency not in self._container:
             self.register(dependency, parameters=parameters)
 
-        return self._container[dependency].get_instance()
+        return cast(T, self._container[dependency].get_instance())
 
     def sub_container(self) -> Container:
         return Container(parent_scoped_dict=self._container)

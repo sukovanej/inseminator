@@ -2,8 +2,8 @@ from threading import Thread
 from time import sleep
 from unittest.mock import MagicMock, call
 
-from src.container import Container
-from src.decorator import Depends
+from inseminator.container import Container
+from inseminator.decorator import Depends
 
 
 def test_decorator_dependency():

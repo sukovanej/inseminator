@@ -1,3 +1,52 @@
+[tool.poetry]
+name = "inseminator"
+version = "0.4.7"
+description = "Python dependency injection library based on type hints"
+authors = ["Milan Suk <Milansuk@email.cz>"]
+readme = "readme.md"
+homepage = "https://www.github.com/sukovanej/inseminator/"
+repository = "https://www.github.com/sukovanej/inseminator/"
+documentation = "https://www.github.com/sukovanej/inseminator/"
+keywords = ["DI", "dependency injection"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3.8",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries"
+]
+packages = [
+    { include = "inseminator" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pydantic = "^1.8.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+black = "^21.10b0"
+isort = "^5.10.0"
+flake8 = "^4.0.1"
+mypy = "^0.910"
+tox = "^3.24.4"
+pytest-cov = "^3.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.black]
 line-length = 120
-target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 120
+known_third_party = "alembic, sqlalchemy"
+
+[tool.mypy]
+strict = true
+
+[tool.coverage.report]
+exclude_lines = ["..."]

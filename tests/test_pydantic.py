@@ -1,11 +1,8 @@
 import os
-from typing import Protocol
 
-import pytest
 from pydantic import BaseSettings
 
-from src.container import Container
-from src.exceptions import ResolverError
+from inseminator.container import Container
 
 
 def test_sub_container():

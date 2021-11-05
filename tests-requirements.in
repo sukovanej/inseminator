@@ -1,7 +1,0 @@
-pytest
-black
-isort
-flake8
-mypy
-tox
-pytest-cov

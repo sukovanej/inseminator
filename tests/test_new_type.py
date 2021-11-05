@@ -1,9 +1,6 @@
 from typing import NewType
 
-import pytest
-
-from src.container import Container
-from src.exceptions import ResolverError
+from inseminator.container import Container
 
 
 def test_new_type_properly_set() -> None:

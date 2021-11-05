@@ -2,7 +2,7 @@ import inspect
 import time
 from functools import wraps
 from threading import Lock
-from typing import Any, Callable, Dict, Mapping, Optional, Type, TypeVar, cast, get_type_hints
+from typing import Any, Callable, Dict, Mapping, Optional, Type, TypeVar, cast
 
 from .metrics import Metrics
 from .resolver import DependencyResolver
@@ -22,7 +22,7 @@ class DecoratorResolver:
     def preload(self) -> None:
         self.__cache = self.construct_dependencies()
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         self.__cache.clear()
 
     def construct_dependencies(self) -> Dict[str, Any]:
@@ -46,11 +46,11 @@ class DecoratorResolver:
 
         return injected_args
 
-    def inject_function(self, fn: Callable) -> Callable:
+    def inject_function(self, fn: Callable[..., Any]) -> Callable[..., Any]:
         self.__parameters = inspect.signature(fn).parameters
 
         @wraps(fn)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             t1 = time.perf_counter()
             injected_args: Dict[str, Any] = {}
 
@@ -76,7 +76,7 @@ class DecoratorResolver:
 
 
 class ParameterDependence:
-    def __init__(self, parameter_dependency: Type) -> None:
+    def __init__(self, parameter_dependency: Any) -> None:
         self.parameter_dependency = parameter_dependency
 
 

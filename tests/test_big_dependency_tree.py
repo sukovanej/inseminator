@@ -3,11 +3,11 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from datetime import timedelta
-from typing import Dict, Iterator, List, Mapping, NewType, Protocol, Tuple
+from typing import Iterator, Mapping, NewType
 from unittest.mock import MagicMock
 
-from src.container import Container
-from src.decorator import Depends
+from inseminator.container import Container
+from inseminator.decorator import Depends
 
 CustomType = object
 

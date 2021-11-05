@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Callable, Dict, Optional, Protocol, Type, TypeVar, Union, cast, get_type_hints
+from typing import Any, Callable, Dict, Optional, Protocol, Type, Union, cast, get_type_hints
 
 from pydantic import BaseSettings
 
@@ -7,24 +7,22 @@ from .dependency import Dependency, StaticDependency
 from .exceptions import ResolverError
 from .scoped_dict import ScopedDict
 
-T = TypeVar("T")
-
-Dependable = Union[Callable[..., T], Type[T]]
+Dependable = Union[Callable[..., Any], Type[Any]]
 
 
 class DependencyResolver:
     def __init__(self, container: ScopedDict[Dependable, Dependency]) -> None:
         self._container = container
 
-    def resolve(self, dependency: Dependable, parameters: Optional[Dict[str, Any]] = None) -> Dependency[T]:
+    def resolve(self, dependency: Dependable, parameters: Optional[Dict[str, Any]] = None) -> Dependency:
         if dependency in self._container:
             return self._container[dependency]
 
-        callable_dependency: Callable
+        callable_dependency: Callable[..., Any]
         is_class = False
         if inspect.isclass(dependency):
             if issubclass(cast(type, dependency), BaseSettings):
-                return StaticDependency(cast(T, dependency()))
+                return StaticDependency(dependency())
 
             if issubclass(cast(type, dependency), cast(type, Protocol)):
                 raise ResolverError(f"Implementation for {dependency.__name__} protocol is not defined.")
