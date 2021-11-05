@@ -16,7 +16,7 @@ jobs:
     - name: Run image
       uses: abatilo/actions-poetry@v2.0.0
       with:
-        poetry-version: ${{ matrix.poetry-version }}
+        poetry-version: 1.1.11
     - name: Build and publish
       env:
         PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
