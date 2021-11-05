@@ -1,8 +1,6 @@
-import pytest
-
-from src.container import Container
-from src.decorator import Depends
-from src.integrations.celery import celery_task
+from inseminator.container import Container
+from inseminator.decorator import Depends
+from inseminator.integrations.celery import celery_task
 
 
 def test_dummy_celery_injector():

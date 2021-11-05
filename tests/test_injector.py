@@ -1,9 +1,7 @@
-import typing
-
 import pytest
 
-from src.container import Container
-from src.exceptions import ContainerRegisterError
+from inseminator.container import Container
+from inseminator.exceptions import ContainerRegisterError
 
 
 def test_basic_register_resolve():
