@@ -12,9 +12,27 @@ Dependable = Union[Callable[..., Any], Type[Any]]
 
 class DependencyResolver:
     def __init__(self, container: ScopedDict[Dependable, Dependency]) -> None:
+        """DependencyResolver constructor.
+
+        :param container: The container with registered and resolved dependencies.
+        :type container: ScopedDict[Dependable, Dependency]
+        """
+
         self._container = container
 
     def resolve(self, dependency: Dependable, parameters: Optional[Dict[str, Any]] = None) -> Dependency:
+        """Resolve the dependency based on input parameters.
+
+        :param dependency: Dependable
+        :type dependency: Class to be resolved.
+
+        :param parameters: Provided parameters to construct the object.
+        :type parameters: Optional[Dict[str, Any]]
+
+        :return: Constructed dependency.
+        :type: Dependency
+        """
+
         if dependency in self._container:
             return self._container[dependency]
 

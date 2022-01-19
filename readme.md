@@ -190,8 +190,3 @@ def MyDependency:
 my_dependency = container.resolve(MyDependency)
 assert my_dependency.parameter == 1
 ```
-
-
-## Docs
-
- - [Clean architecture introduction (draft version)](docs/introduction.md)

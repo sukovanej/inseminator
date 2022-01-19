@@ -9,9 +9,25 @@ from .resolver import DependencyResolver
 
 
 class DecoratorResolver:
+    """Class used internally to provide functionality for ``inject`` decorator."""
+
     def __init__(
         self, resolver: DependencyResolver, metrics: Optional[Metrics] = None, cache_enabled: bool = True
     ) -> None:
+        """DecoratorResolver constructor.
+
+        :param resolver: DependencyResolver to be used for resolving dependencies.
+        :type resolver: DependencyResolver
+
+        :param metrics: Metrics object for reporting.
+        :type metrics: Optional[Metrics]
+
+        :param cache_enabled: If set to ``True``, objects are constructed only onced and then reused.
+        :type cache_enabled: bool
+
+        :rtype: None
+        """
+
         self.__resolver = resolver
         self.__metrics = metrics
         self.__cache_enabled = cache_enabled
@@ -20,12 +36,26 @@ class DecoratorResolver:
         self.__parameters: Optional[Mapping[str, inspect.Parameter]] = None
 
     def preload(self) -> None:
+        """Construct all dependencies and store it in the cache.
+
+        :rtype: None
+        """
+
         self.__cache = self.construct_dependencies()
 
     def clear_cache(self) -> None:
+        """Remove all cached dependencies.
+
+        :rtype: None
+        """
+
         self.__cache.clear()
 
     def construct_dependencies(self) -> Dict[str, Any]:
+        """Construct all dependencies.
+
+        :rtype: None
+        """
         injected_args: Dict[str, Any] = {}
 
         if self.__parameters is None:
@@ -47,6 +77,15 @@ class DecoratorResolver:
         return injected_args
 
     def inject_function(self, fn: Callable[..., Any]) -> Callable[..., Any]:
+        """Convert the function into a new function that will received requested dependencies when invoked.
+
+        :param fn: The function.
+        :type fn: Callable[..., Any]
+
+        :return: Function that will be assigned dependencies.
+        :rtype: Callable[..., Any]
+        """
+
         self.__parameters = inspect.signature(fn).parameters
 
         @wraps(fn)
@@ -76,7 +115,14 @@ class DecoratorResolver:
 
 
 class ParameterDependence:
+    """Helper class to represent dependency request."""
+
     def __init__(self, parameter_dependency: Any) -> None:
+        """ParameterDependence constructor.
+
+        :param parameter_dependency: The dependency type.
+        :type parameter_dependency: Any
+        """
         self.parameter_dependency = parameter_dependency
 
 
@@ -84,4 +130,12 @@ T = TypeVar("T")
 
 
 def Depends(parameter_type: Type[T]) -> T:
+    """Helper function to mark a function parameter as a dependency.
+
+    :param parameter_type: The dependency
+    :type parameter_type: Type[T]
+
+    :return: Value representing the dependency request.
+    :rtype: T to satisfy type checker but it actually returns an instance of ``ParameterDependence``.
+    """
     return cast(T, ParameterDependence(parameter_type))
