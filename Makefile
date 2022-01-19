@@ -6,3 +6,6 @@ check:
 	poetry run black --check inseminator tests examples
 	poetry run isort --check inseminator tests examples
 	poetry run mypy inseminator
+
+test:
+	poetry run pytest tests
