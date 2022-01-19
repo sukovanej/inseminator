@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "inseminator-celery-example"
+version = "0.1.0"
+description = "Celery example usage with inseminator package"
+authors = ["Milan Suk <Milansuk@email.cz>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+celery = {extras = ["redis"], version = "^5.2.3"}
+SQLAlchemy = "^1.4.29"
+psycopg2 = "^2.9.3"
+alembic = "^1.7.5"
+requests = "^2.27.1"
+inseminator = "^0.4.7"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
