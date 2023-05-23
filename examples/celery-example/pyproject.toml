@@ -10,7 +10,7 @@ celery = {extras = ["redis"], version = "^5.2.3"}
 SQLAlchemy = "^1.4.29"
 psycopg2 = "^2.9.3"
 alembic = "^1.7.5"
-requests = "^2.27.1"
+requests = "^2.31.0"
 inseminator = "^0.4.7"
 
 [tool.poetry.dev-dependencies]
