@@ -8,8 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        poetry-version: [1.1.11]
+        poetry-version: [1.6.1]
         python-version: ["3.8", "3.9", "3.10"]
+        pydantic-version: ["1.8.2", "2.4.2"]
+        extras: [null, "pydanticV2"]
 
     steps:
     - uses: actions/checkout@v2
@@ -30,6 +32,7 @@ jobs:
         poetry run mypy inseminator
     - name: Generate coverage report
       run: |
+        poetry run pip install pydantic={ matrix.pydantic-version }
         poetry run python -m pytest tests/ --cov=inseminator/ --cov=examples/ --cov-branch --cov-report=xml
     - name: Upload coverage to Codecov  
       uses: codecov/codecov-action@v1
